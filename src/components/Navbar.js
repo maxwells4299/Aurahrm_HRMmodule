@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   Users, Briefcase, FileSearch, Calendar, 
-  Layers, ShieldAlert, DollarSign, LogOut, KeyRound 
+  Layers, ShieldAlert, DollarSign, LogOut, KeyRound, User 
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -105,6 +105,19 @@ export default function Navbar() {
               Careers
             </Link>
             <Link 
+              href="/applicant" 
+              className="btn" 
+              style={{
+                background: pathname === '/applicant' ? 'var(--primary-glow)' : 'transparent',
+                color: pathname === '/applicant' ? 'var(--primary)' : 'var(--text-secondary)',
+                padding: '8px 16px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <User size={16} />
+              My Applications
+            </Link>
+            <Link 
               href="/track" 
               className="btn" 
               style={{
@@ -115,7 +128,7 @@ export default function Navbar() {
               }}
             >
               <FileSearch size={16} />
-              Track Application
+              Track by ID
             </Link>
           </>
         ) : (
