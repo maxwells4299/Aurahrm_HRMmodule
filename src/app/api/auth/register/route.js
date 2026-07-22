@@ -41,6 +41,13 @@ export async function POST(request) {
     });
   } catch (err) {
     console.error('Registration API error:', err);
-    return NextResponse.json({ error: 'Internal registration error' }, { status: 500 });
+    // Return the real error details so we can diagnose Vercel issues
+    return NextResponse.json({
+      error: 'Internal registration error',
+      detail: err?.message ?? String(err),
+      code: err?.code,
+      meta: err?.meta,
+    }, { status: 500 });
   }
 }
+
