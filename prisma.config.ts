@@ -10,6 +10,9 @@ export default defineConfig({
     seed: "node prisma/seed.js",
   },
   datasource: {
+    // Pooler URL (Transaction pooler, port 6543) — used by the app and Vercel
     url: process.env["DATABASE_URL"],
+    // Direct URL — used by prisma db push / migrate only
+    directUrl: process.env["DIRECT_URL"],
   },
 });
