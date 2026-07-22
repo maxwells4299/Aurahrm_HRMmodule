@@ -1,0 +1,103 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Job {
+  id           String      @id @default(uuid())
+  title        String
+  department   String
+  location     String
+  type         String      // Full-time, Part-time, Remote
+  salaryRange  String
+  description  String
+  requirements String
+  status       String      // OPEN, CLOSED
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  applicants   Applicant[]
+}
+
+model Applicant {
+  id             String      @id @default(uuid()) // Tracking ID
+  name           String
+  email          String
+  phone          String
+  resumeUrl      String
+  transcriptUrl  String      // Mandatory academic transcript upload
+  portfolioUrl   String?     // Optional portfolio link
+  coverLetter    String      // Mandatory cover letter
+  status         String      // APPLIED, SHORTLISTED, REJECTED, INTERVIEW_SCHEDULED, INTERVIEW_CONDUCTED, OFFER_ISSUED, OFFER_ACCEPTED, ONBOARDING, COMPLETED
+  jobId          String
+  job            Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  appliedAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  
+  // Interview Phase
+  interviewDate  DateTime?
+  interviewer    String?
+  interviewNotes String?
+  interviewScore String?     // e.g. Pass, Fail, or ratings
+
+  // Offer Phase
+  salaryOffered  Int?
+  startDate      DateTime?
+  offerLetterUrl String?     // Path to generated PDF/text document
+  signedAt       DateTime?
+
+  // Onboarding Phase
+  onboardingTasks OnboardingTask[]
+}
+
+model OnboardingTask {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  status      String    // PENDING, COMPLETED
+  requiredFile Boolean  @default(false)
+  fileUrl     String?
+  applicantId String
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+}
+
+model Employee {
+  id          String    @id @default(uuid())
+  name        String
+  email       String    @unique
+  phone       String
+  role        String
+  department  String
+  joinDate    DateTime  @default(now())
+  salary      Int
+  status      String    // Active, Suspended, Resigned
+  leaves      Leave[]
+}
+
+model Leave {
+  id          String    @id @default(uuid())
+  employeeId  String
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  type        String    // Annual, Sick, Unpaid
+  startDate   DateTime
+  endDate     DateTime
+  reason      String
+  status      String    // PENDING, APPROVED, REJECTED
+  createdAt   DateTime  @default(now())
+}
+
+enum Role {
+  APPLICANT
+  EMPLOYEE
+  HR_ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed password
+  role      Role     @default(APPLICANT)
+  createdAt DateTime @default(now())
+}
