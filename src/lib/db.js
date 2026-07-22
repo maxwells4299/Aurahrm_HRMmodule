@@ -1,17 +1,17 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
-let prisma;
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
 
-if (process.env.NODE_ENV === 'production') {
-  const adapter = new PrismaBetterSqlite3({ url: 'file:./dev.db' });
-  prisma = new PrismaClient({ adapter });
-} else {
-  if (!global.globalPrisma) {
-    const adapter = new PrismaBetterSqlite3({ url: 'file:./dev.db' });
-    global.globalPrisma = new PrismaClient({ adapter });
-  }
-  prisma = global.globalPrisma;
+const globalForPrisma = globalThis;
+
+export const db =
+  globalForPrisma.prisma ||
+  new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = db;
 }
-
-export const db = prisma;
